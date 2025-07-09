@@ -1,0 +1,38 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="card mx-auto room-detail-card">
+        <div class="card-body">
+            <h2 class="card-title">{{ room.name }}</h2>
+            <!-- Карусель Bootstrap -->
+            <div id="roomCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="{% static 'booking/images/room' %}{{ room.id }}_1.jpg" class="d-block w-100 rounded" alt="Фото 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static 'booking/images/room' %}{{ room.id }}_2.jpg" class="d-block w-100 rounded" alt="Фото 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="{% static 'booking/images/room' %}{{ room.id }}_3.jpg" class="d-block w-100 rounded" alt="Фото 3">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+            <p><strong>Місткість:</strong> {{ room.capacity }}</p>
+            <p>{{ room.description }}</p>
+            <a href="{% url 'room_list' %}" class="btn btn-secondary">Назад до списку</a>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
