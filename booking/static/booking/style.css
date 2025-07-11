@@ -20,16 +20,17 @@ body {
 /* НОВЫЙ БЛОК: Стили для body ТОЛЬКО на странице деталей комнаты */
 
 
-/* Заголовок */
-h1 {
+/* Заголовок - Пропозиції */
+.smaller-heading {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
     color: #ffffff;
-    text-align: center;
-    margin-bottom: 2rem !important;
-    font-size: 2.5rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    font-weight: 400; /* или 500 вместо bold */
+    letter-spacing: 0.3px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem;
 }
+
+
 
 /* Карточки */
 .card {
@@ -132,17 +133,6 @@ h1 {
 }
 
 
-footer a {
-    color: #6c757d; /* Серый цвет по умолчанию (как text-muted) */
-    text-decoration: none; /* Убираем подчеркивание по умолчанию */
-    transition: color 0.3s ease; /* Добавляем плавный переход цвета */
-}
-
-footer a:hover {
-    color: #000000; /* Цвет при наведении: ЧЁРНЫЙ */
-    text-decoration: underline; /* Добавляем подчеркивание при наведении */
-}
-
 .room-detail-card .btn-secondary {
     background-color: rgba(255, 255, 255, 0.6) !important; /* Светло-серый, полупрозрачный фон */
     border-color: rgba(255, 255, 255, 0.8) !important; /* Светло-серая, полупрозрачная рамка */
@@ -156,6 +146,41 @@ footer a:hover {
     border-color: rgba(150, 150, 150, 0.8) !important; /* Рамка темнеет при наведении */
     color: #000 !important; /* Текст становится черным при наведении */
 }
+
+/* Стилі до навбару */
+.custom-navbar {
+    background: linear-gradient(to right, #007991, #7dc4b9); /* как фон у body */
+    background-size: cover;
+    background-position: center;
+}
+
+.navbar .nav-link:hover {
+    text-decoration: underline;
+    color: #ffffff !important;
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Футер с тем же градиентом что и основной фон */
+.custom-footer {
+    background: linear-gradient(to right, #007991, #7dc4b9);
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.custom-footer p {
+    margin-bottom: 0;
+}
+
+
 
 
 

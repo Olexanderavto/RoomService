@@ -2,13 +2,20 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4"> {# ДОБАВЛЯЕМ контейнер здесь #}
-    <h1 class="mb-4">Room Booking</h1>
+<div class="container mt-4">
+    <h3 class="smaller-heading">Пропозиції</h3>
+
     <div class="row justify-content-center">
         {% for room in rooms %}
         <div class="col-md-6 col-lg-4 mb-4 d-flex">
             <div class="card flex-fill">
-                <img src="{% static 'booking/images/room' %}{{ room.id }}.jpg" class="card-img-top" alt="{{ room.name }}">
+                {# ИЗМЕНЕНИЕ ЗДЕСЬ: используем room.images.first.image.url #}
+                {% if room.images.first %} {# Проверяем, есть ли хотя бы одно изображение #}
+                    <img src="{{ room.images.first.image.url }}" class="card-img-top" alt="{{ room.name }}">
+                {% else %}
+                    {# Если изображений нет, показываем заглушку (убедитесь, что default_room.jpg существует в booking/static/booking/images/) #}
+                    <img src="{% static 'booking/images/default_room.jpg' %}" class="card-img-top" alt="Нет фото">
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ room.name }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Вміщує {{ room.capacity }} осіб</h6>
@@ -19,7 +26,7 @@
         </div>
         {% endfor %}
     </div>
-</div> {# ЗАКРЫВАЕМ контейнер здесь #}
+</div>
 {% endblock %}
 
 

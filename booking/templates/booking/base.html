@@ -7,10 +7,34 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'booking/style.css' %}">
 </head>
-<body {% block body_classes %}{% endblock body_classes %}>
+<body {% block body_classes %}{% endblock body_classes %}> {#Єто для того если в одном шаблоне нужно фон, а в другом — нет#}
     {# Используем d-flex и flex-column для Flexbox #}
     <div class="d-flex flex-column min-vh-100"> {# Добавили div для Flexbox #}
         {# Если у вас есть навигационная панель, она должна быть здесь #}
+
+        {% if show_navbar %}
+        <nav class="navbar navbar-expand-lg shadow-sm custom-navbar">
+          <div class="container">
+            <a class="navbar-brand fw-bold text-white" href="{% url 'room_list' %}">Room Booking.com</a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'room_list' %}">Головна</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'about_us' %}">Про нас</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        {% endif %}
+
+
 
         <main class="flex-grow-1"> {# Добавляем тег <main> и класс flex-grow-1 #}
             {% block content %}
@@ -18,12 +42,8 @@
             {% endblock %}
         </main>
 
-        <footer class="text-center py-2 mt-5 bg-light text-muted">
+        <footer class="text-center py-2 mt-5 custom-footer">
             <div class="container">
-                {# Условное отображение ссылки "Про нас" #}
-                {% if request.resolver_match.url_name != 'about_us' %}
-                    <p><a href="{% url 'about_us' %}" class="text-muted">Про нас</a></p>
-                {% endif %}
                 <p>&copy; 2025 Room Booking. Всі права захищено.</p>
             </div>
         </footer>
