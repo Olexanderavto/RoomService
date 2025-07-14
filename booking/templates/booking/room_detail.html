@@ -2,39 +2,48 @@
 {% load static %}
 
 {% block content %}
-    <div class="card mx-auto room-detail-card">
-        <div class="card-body">
-            <h2 class="card-title">{{ room.name }}</h2>
-            <div id="roomCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    {# ИЗМЕНЕНИЕ ЗДЕСЬ: итерируемся по room.images.all #}
-                    {% for image in room.images.all %}
-                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ image.image.url }}" class="d-block w-100 rounded" alt="{{ image.caption|default:room.name }}">
-                        </div>
-                    {% empty %}
-                        {# Если изображений нет, показываем заглушку как единственный элемент карусели #}
-                        <div class="carousel-item active">
-                            <img src="{% static 'booking/images/default_room.jpg' %}" class="d-block w-100 rounded" alt="Нет фото">
-                        </div>
-                    {% endfor %}
+<div class="container py-5">
+    {% if room.images.all %}
+    <div class="mb-4" style="max-width: 1000px; margin: 0 auto;">
+        <div id="roomCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in room.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.image.url }}" class="d-block w-100" style="border-radius: 12px;" alt="{{ image.caption|default:room.name }}">
                 </div>
-                {# Кнопки навигации карусели отображаем только если есть больше одного изображения #}
-                {% if room.images.count > 1 %}
-                    <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-                {% endif %}
+                {% endfor %}
             </div>
-            <p><strong>Місткість:</strong> {{ room.capacity }}</p>
-            <p>{{ room.description }}</p>
-            <a href="{% url 'room_list' %}" class="btn btn-secondary">Назад до списку</a>
+            {% if room.images.count > 1 %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            {% endif %}
         </div>
     </div>
+    {% endif %}
+
+    <div class="card mx-auto shadow-sm" style="max-width: 800px;">
+        <div class="card-body">
+            <h2 class="card-title mb-3">{{ room.name }}</h2>
+            <p class="text-muted mb-2"><strong>Вміщує:</strong> {{ room.capacity }} осіб</p>
+            <p class="mb-4">{{ room.description }}</p>
+
+            {# ИЗМЕНЕНИЕ ЭТОГО БЛОКА #}
+            {% if source_category_id %}
+                <a href="{% url 'room_list' %}?category={{ source_category_id }}" class="btn btn-secondary">Назад до кімнат цієї категорії</a>
+            {% else %}
+                <a href="{% url 'room_list' %}" class="btn btn-secondary">Назад до всіх кімнат</a>
+            {% endif %}
+            {# КОНЕЦ ИЗМЕНЕНИЯ БЛОКА #}
+        </div>
+    </div>
+</div>
+
 {% endblock %}
+
 
 
 

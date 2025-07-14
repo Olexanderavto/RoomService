@@ -2,31 +2,40 @@
 {% load static %}
 
 {% block content %}
+{# Здесь раньше были кнопки фильтрации по категориям, теперь они удалены #}
+
 <div class="container mt-4">
+
     <h3 class="smaller-heading">Пропозиції</h3>
 
-    <div class="row justify-content-center">
+    <div class="row">
         {% for room in rooms %}
-        <div class="col-md-6 col-lg-4 mb-4 d-flex">
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex">
             <div class="card flex-fill">
-                {# ИЗМЕНЕНИЕ ЗДЕСЬ: используем room.images.first.image.url #}
-                {% if room.images.first %} {# Проверяем, есть ли хотя бы одно изображение #}
-                    <img src="{{ room.images.first.image.url }}" class="card-img-top" alt="{{ room.name }}">
+                {% if room.photo %}
+                    <img src="{{ room.photo.url }}" class="card-img-top" alt="{{ room.name }}">
                 {% else %}
-                    {# Если изображений нет, показываем заглушку (убедитесь, что default_room.jpg существует в booking/static/booking/images/) #}
-                    <img src="{% static 'booking/images/default_room.jpg' %}" class="card-img-top" alt="Нет фото">
+                    <img src="{% static 'booking/images/default_room.jpg' %}" class="card-img-top" alt="Немає фото">
                 {% endif %}
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ room.name }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Вміщує {{ room.capacity }} осіб</h6>
-                    <p class="card-text">{{ room.description }}</p>
-                    <a href="{% url 'room_detail' room.id %}" class="btn btn-primary">Детальніше</a>
+                    <a href="{% url 'room_detail' room.id %}{% if selected_category %}?category={{ selected_category }}{% endif %}" class="btn btn-primary mt-auto">Детальніше</a>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <p>Наразі немає доступних кімнат.</p>
+        </div>
         {% endfor %}
+    </div>
+    <div class="mb-4">
+        <a href="{% url 'category_list' %}" class="btn btn-secondary">← Назад до Категорій</a>
     </div>
 </div>
 {% endblock %}
+
+
 
 
