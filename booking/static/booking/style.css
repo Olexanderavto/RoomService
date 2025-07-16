@@ -14,16 +14,19 @@ h1, h2, h3, h5 {
     color: #2e2e2e;
 }
 
-/* Карточки */
+/* Карточки в room_list*/
 .card {
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.3s ease;
     border: 1px solid #eaeaea;
     will-change: auto; /* устраняет размытие текста */
     backface-visibility: hidden;
+    overflow: hidden;
 }
+
+
 
 .card:hover {
     box-shadow:
@@ -45,12 +48,11 @@ h1, h2, h3, h5 {
     font-size: 0.9rem; /* ЭТО нужно изменить */
 }
 
-/* Картинки */
+/* Картинки на карточках*/
 .card-img-top {
     height: 220px;
     object-fit: cover;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+
 }
 
 /* Кнопки */
@@ -71,24 +73,6 @@ h1, h2, h3, h5 {
     /* Тень при наведении оставляем более выраженной или увеличиваем */
     box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4); /* Эту тень можно оставить как есть или сделать еще больше */
 }
-
-.btn-secondary {
-    background-color: transparent; /* Прозрачный фон */
-    border: 2px solid #000000;    /* Черная рамка */
-    color: #000000;               /* Черный текст */
-    border-radius: 10px;
-    font-weight: 500;
-    padding: 5px 20px;
-    transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background-color: #000000;    /* Черный фон при наведении */
-    border-color: #000000;        /* Рамка тоже черная при наведении */
-    color: #FFFFFF;               /* Белый текст при наведении */
-}
-
-
 
 /* Навбар */
 .custom-navbar {
@@ -127,6 +111,29 @@ h1, h2, h3, h5 {
     font-weight: 450;
     color: #2e2e2e;
     margin-bottom: 2rem;
+}
+
+/* Современные карточки категорий */
+.category-card-modern {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.category-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Иконки категорий */
+.category-icon-modern {
+    font-size: 3rem;
+    padding: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 
