@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import date
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -39,15 +41,16 @@ class RoomImage(models.Model):
     def __str__(self):
         return f"Фото для {self.room.name}"
 
+
 class Booking(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_date = models.DateField(default=date.today)
+    end_date = models.DateField()
 
     def __str__(self):
-        return f"{self.room.name} — {self.date} ({self.start_time} - {self.end_time})"
+        return f"{self.room.name} — {self.start_date} → {self.end_date}"
+
 
 class RoomRating(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='ratings')

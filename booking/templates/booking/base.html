@@ -29,6 +29,22 @@
                   <a class="nav-link text-white" href="{% url 'category_list' %}">Головна</a>
                 </li>
 
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                      <a class="nav-link text-white" href="{% url 'my_bookings' %}">Мої бронювання</a>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn nav-link text-white px-3" style="text-decoration:none;">Вийти</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link text-white" href="{% url 'login' %}">Увійти</a>
+                    </li>
+                    {% endif %}
+
                 <li class="nav-item">
                   <a class="nav-link text-white" href="{% url 'about_us' %}">Про нас</a>
                 </li>

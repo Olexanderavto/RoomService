@@ -1,0 +1,17 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+    <h2 class="text-center mb-4">Реєстрація</h2>
+
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success w-100">Зареєструватися</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <small>Вже маєте акаунт? <a href="{% url 'login' %}">Увійти</a></small>
+    </div>
+</div>
+{% endblock %}
