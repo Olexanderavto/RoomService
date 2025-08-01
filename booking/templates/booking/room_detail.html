@@ -2,7 +2,10 @@
 {% load static %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 900px;">
+<div class="py-0 px-2">
+    <a class="navbar-brand fw-bold text-dark" href="{% url 'category_list' %}">Room Booking.com</a>
+</div>
+<div class="container py-4" style="max-width: 900px;">
 
     <!-- ✅ Карусель изображений -->
     {% if room.images.all %}

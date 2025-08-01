@@ -6,8 +6,20 @@
 
     <form method="post" class="card p-4 shadow-sm">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success w-100">Зареєструватися</button>
+
+        <div class="mb-3">
+            {{ form.username }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.password1 }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.password2 }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Зареєструватися</button>
     </form>
 
     <div class="text-center mt-3">
@@ -15,3 +27,4 @@
     </div>
 </div>
 {% endblock %}
+

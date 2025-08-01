@@ -6,6 +6,7 @@ from django.urls import reverse
 from .forms import BookingForm
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from .forms import CustomRegisterForm
 
 
 def room_list(request):
@@ -129,18 +130,20 @@ def delete_booking(request, booking_id):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomRegisterForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Реєстрація успішна! Тепер увійдіть у систему.")
             return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomRegisterForm()
 
     return render(request, 'booking/register.html', {
         'form': form,
         'show_navbar': True
     })
+
+
 
 
 
