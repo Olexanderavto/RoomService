@@ -1,63 +1,59 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Avg
-from django.contrib.auth.decorators import login_required
-from .models import Room, Category, RoomRating, Booking
-from django.urls import reverse
-from .forms import BookingForm
+from django.views.generic import ListView, DetailView, TemplateView, CreateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
+from django.db.models import Avg
+from .models import Room, Category, RoomRating, Booking
+from .forms import BookingForm, CustomRegisterForm
 from django.contrib.auth.forms import UserCreationForm
-from .forms import CustomRegisterForm
+from django.shortcuts import get_object_or_404
 
 
-def room_list(request):
-    category_id = request.GET.get('category')
+# ✅ Список комнат
+class RoomListView(ListView):
+    model = Room
+    template_name = 'booking/room_list.html'
+    context_object_name = 'rooms'
 
-    if category_id:
-        rooms = Room.objects.filter(category_id=category_id)
-    else:
-        rooms = Room.objects.all()
+    def get_queryset(self):
+        category_id = self.request.GET.get('category')
+        qs = Room.objects.all().annotate(average_rating=Avg('ratings__rating'))
+        if category_id:
+            qs = qs.filter(category_id=category_id)
+        return qs
 
-    # ✅ Добавляем средний рейтинг для каждой комнаты (чтобы можно было сразу выводить в карточках)
-    rooms = rooms.annotate(average_rating=Avg('ratings__rating'))
-
-    # ✅ Округляем рейтинг до целого числа
-    for room in rooms:
-        if room.average_rating:
-            room.average_rating = round(room.average_rating)
-
-    return render(request, 'booking/room_list.html', {
-        'rooms': rooms,
-        'selected_category': int(category_id) if category_id else None,
-        'show_navbar': True,
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_id = self.request.GET.get('category')
+        context['selected_category'] = int(category_id) if category_id else None
+        context['show_navbar'] = True
+        return context
 
 
-def room_detail(request, room_id):
-    room = get_object_or_404(Room, id=room_id)
-    source_category_id = request.GET.get('category')
+# ✅ Детали комнаты
+class RoomDetailView(DetailView):
+    model = Room
+    template_name = 'booking/room_detail.html'
+    context_object_name = 'room'
+    pk_url_kwarg = 'room_id'
 
-    # ✅ Средний рейтинг
-    average_rating = room.ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-
-    # ✅ Рейтинг пользователя (если он уже ставил)
-    user_rating = None
-    if request.user.is_authenticated:
-        user_rating_obj = room.ratings.filter(user=request.user).first()
-        user_rating = user_rating_obj.rating if user_rating_obj else None
-
-    return render(request, 'booking/room_detail.html', {
-        'room': room,
-        'average_rating': round(average_rating),
-        'user_rating': user_rating,
-        'show_navbar': False,
-        'source_category_id': source_category_id,
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        room = self.object
+        avg_rating = room.ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+        context['average_rating'] = round(avg_rating)
+        if self.request.user.is_authenticated:
+            user_rating_obj = room.ratings.filter(user=self.request.user).first()
+            context['user_rating'] = user_rating_obj.rating if user_rating_obj else None
+        context['show_navbar'] = False
+        context['source_category_id'] = self.request.GET.get('category')
+        return context
 
 
-@login_required
-def rate_room(request, room_id):
-    """ ✅ Сохранение или обновление рейтинга комнаты """
-    if request.method == 'POST':
+# ✅ Оценка комнаты
+class RateRoomView(LoginRequiredMixin, TemplateView):
+    def post(self, request, room_id):
         rating_value = int(request.POST.get('rating', 0))
         if 1 <= rating_value <= 5:
             RoomRating.objects.update_or_create(
@@ -65,85 +61,106 @@ def rate_room(request, room_id):
                 user=request.user,
                 defaults={'rating': rating_value}
             )
-        # ✅ Сохраняем category параметр при редиректе
         source_category_id = request.GET.get('category')
         if source_category_id:
             return redirect(f"{reverse('room_detail', args=[room_id])}?category={source_category_id}")
-        else:
-            return redirect('room_detail', room_id=room_id)
+        return redirect('room_detail', room_id=room_id)
 
 
-def about_us(request):
-    return render(request, 'booking/about_us.html', {
-        'show_navbar': True
-    })
+# ✅ О нас
+class AboutUsView(TemplateView):
+    template_name = 'booking/about_us.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
 
 
-def category_list(request):
-    categories = Category.objects.all()
-    return render(request, 'booking/category_list.html', {
-        'categories': categories,
-        'show_navbar': True,
-    })
+# ✅ Список категорий
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'booking/category_list.html'
+    context_object_name = 'categories'
 
-@login_required
-def book_room(request, room_id):
-    room = get_object_or_404(Room, id=room_id)
-    existing_bookings = Booking.objects.filter(room=room).order_by('start_date')
-
-    if request.method == 'POST':
-        form = BookingForm(request.POST, initial={'room': room})
-        if form.is_valid():
-            booking = form.save(commit=False)
-            booking.room = room
-            booking.user = request.user
-            booking.save()
-            messages.success(request, "Бронювання успішно створено!")
-            return redirect('my_bookings')
-    else:
-        form = BookingForm(initial={'room': room})
-
-    return render(request, 'booking/book_room.html', {
-        'room': room,
-        'form': form,
-        'existing_bookings': existing_bookings,
-        'show_navbar': True
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
 
 
+# ✅ Бронирование комнаты
+class BookRoomView(LoginRequiredMixin, CreateView):
+    model = Booking
+    form_class = BookingForm
+    template_name = 'booking/book_room.html'
 
-@login_required
-def my_bookings(request):
-    bookings = Booking.objects.filter(user=request.user).select_related('room')
-    return render(request, 'booking/my_bookings.html', {
-        'bookings': bookings,
-        'show_navbar': True
-    })
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['initial'] = {'room': get_object_or_404(Room, id=self.kwargs['room_id'])}
+        return kwargs
 
-@login_required
-def delete_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-    if request.method == 'POST':
-        booking.delete()
+    def form_valid(self, form):
+        form.instance.room = get_object_or_404(Room, id=self.kwargs['room_id'])
+        form.instance.user = self.request.user
+        messages.success(self.request, "Бронювання успішно створено!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('my_bookings')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        room = get_object_or_404(Room, id=self.kwargs['room_id'])
+        context['room'] = room
+        context['existing_bookings'] = Booking.objects.filter(room=room).order_by('start_date')
+        context['show_navbar'] = True
+        return context
+
+
+# ✅ Мои бронирования
+class MyBookingsView(LoginRequiredMixin, ListView):
+    model = Booking
+    template_name = 'booking/my_bookings.html'
+    context_object_name = 'bookings'
+
+    def get_queryset(self):
+        return Booking.objects.filter(user=self.request.user).select_related('room')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
+
+
+# ✅ Удаление брони
+class DeleteBookingView(LoginRequiredMixin, DeleteView):
+    model = Booking
+    success_url = reverse_lazy('my_bookings')
+    template_name = 'booking/delete_booking.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
         messages.success(request, "Бронювання видалено.")
-        return redirect('my_bookings')
-
-def register(request):
-    if request.method == 'POST':
-        form = CustomRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Реєстрація успішна! Тепер увійдіть у систему.")
-            return redirect('login')
-    else:
-        form = CustomRegisterForm()
-
-    return render(request, 'booking/register.html', {
-        'form': form,
-        'show_navbar': True
-    })
+        return super().delete(request, *args, **kwargs)
 
 
+# ✅ Регистрация
+class RegisterView(CreateView):
+    form_class = CustomRegisterForm
+    template_name = 'booking/register.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Реєстрація успішна! Тепер увійдіть у систему.")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
 
 
 
