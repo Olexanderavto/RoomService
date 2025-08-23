@@ -18,22 +18,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework.authtoken import views as drf_auth_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    # HTML сайт
-    path('', include('booking.urls')),
-
-    # API
-    path('api/', include('booking.api_urls')),
-
-    # token
-    path('api/token/', obtain_auth_token, name='api_token_auth'),
+    path("admin/", admin.site.urls),
+    path("", include("booking.urls")),
+    path("api/token-auth/", drf_auth_views.obtain_auth_token),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
 
 
